@@ -174,8 +174,8 @@ g = ((rr - 20) / 13) ** 2 + ((cc - 18) / 11) ** 2 < 1
 s = ((rr - 21) / 12) ** 2 + ((cc - 22) / 11) ** 2 < 1
 bd = lambda m: m & ~ndi.binary_erosion(m)
 bg_, bs_ = bd(g), bd(s)
-fig, axs = plt.subplots(1, 2, figsize=(W, 1.7), gridspec_kw=dict(width_ratios=[1, 1.25], wspace=0.45))
-ax = axs[0]
+fig = plt.figure(figsize=(W, 1.75))
+ax = fig.add_axes([0.0, 0.04, 0.36, 0.72])  # left: boundary pairs
 rgb = np.ones((n, n, 3)); rgb[g] = [0.92, 0.92, 0.92]
 rgb[bg_] = [0.0, 0.22, 0.65]; rgb[bs_] = [0.69, 0.0, 0.0]; rgb[bg_ & bs_] = [0.4, 0.4, 0.4]
 ax.imshow(rgb, interpolation="nearest")
@@ -188,14 +188,15 @@ for i in range(0, len(ps), 9):  # a few of the pairwise distances
 ax.plot([ps[i_far, 1], pg[j_far, 1]], [ps[i_far, 0], pg[j_far, 0]], color=PURPLE, lw=1.2)
 ax.set_xticks([]); ax.set_yticks([])
 ax.set_title(f"area {g.sum()} px, boundary {bg_.sum()} px\nall boundary pairs; purple = HD", fontsize=5.8)
-ax = axs[1]
+ax = fig.add_axes([0.62, 0.16, 0.36, 0.6])  # right: runtimes, room for y labels on its left
 tools = ["MedPy", "MeshMetrics", "MONAI", "MONAI\n+cuCIM", "DisTorch"]
 ms = [2.6e4, 8.5e3, 723, 24.9, 29.1]  # SegTHOR, ms per scan, from the paper (Table 1)
 cols = ["#c9c9c9", "#c9c9c9", "#9db7e8", "#9db7e8", "#7fbf7f"]
 ax.barh(range(5), ms, color=cols, height=0.6)
 for i, v in enumerate(ms):
     ax.text(v * 1.2, i, f"{v:g} ms" if v < 1000 else f"{v / 1000:g} s", va="center", fontsize=5.3)
-ax.set_xscale("log"); ax.set_xlim(10, 3e5); ax.invert_yaxis()
+ax.set_xscale("log"); ax.set_xlim(10, 1e6); ax.invert_yaxis()
+ax.set_xlabel("ms per scan", fontsize=5.6)
 ax.set_yticks(range(5)); ax.set_yticklabels(tools, fontsize=5.4)
 ax.set_title("HD runtime per SegTHOR scan\n(from the paper; log scale)", fontsize=6)
 clean(ax)
