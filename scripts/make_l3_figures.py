@@ -1,6 +1,6 @@
 """Figures for the L3 study notes (registration).
 
-Run:  python make_l3_figures.py   (writes l3_*.pdf next to this file; needs numpy, scipy, matplotlib)
+Run:  python make_l3_figures.py   (writes l3_*.pdf into ../figures; needs numpy, scipy, matplotlib)
 """
 from pathlib import Path
 
@@ -9,7 +9,7 @@ import numpy as np
 from matplotlib.patches import FancyBboxPatch, Polygon
 from scipy import ndimage as ndi
 
-OUT = Path(__file__).resolve().parent
+OUT = Path(__file__).resolve().parent.parent / "figures"
 W = 3.7  # column width in inches
 
 plt.rcParams.update({

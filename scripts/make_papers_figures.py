@@ -1,7 +1,7 @@
 """Figures for the 'Course papers' study notes.
 
 Numbers marked 'from the paper' are copied from the PDFs in ../../papers; everything else is a toy example.
-Run:  python make_papers_figures.py   (writes papers_*.pdf next to this file; needs numpy, scipy, matplotlib)
+Run:  python make_papers_figures.py   (writes papers_*.pdf into ../figures; needs numpy, scipy, matplotlib)
 """
 from pathlib import Path
 
@@ -11,7 +11,7 @@ from matplotlib.patches import FancyBboxPatch, Rectangle
 from scipy import interpolate
 from scipy import ndimage as ndi
 
-OUT = Path(__file__).resolve().parent
+OUT = Path(__file__).resolve().parent.parent / "figures"
 W = 3.7  # column width in inches
 
 plt.rcParams.update({

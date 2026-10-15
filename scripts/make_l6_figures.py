@@ -1,6 +1,6 @@
 """Figures for the L6 study notes (ethics, data, reproducibility).
 
-Run:  python make_l6_figures.py   (writes l6_*.pdf next to this file; needs numpy, matplotlib)
+Run:  python make_l6_figures.py   (writes l6_*.pdf into ../figures; needs numpy, matplotlib)
 """
 from pathlib import Path
 
@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.patches import FancyBboxPatch
 
-OUT = Path(__file__).resolve().parent
+OUT = Path(__file__).resolve().parent.parent / "figures"
 W = 3.7  # column width in inches
 
 plt.rcParams.update({

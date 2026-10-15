@@ -1,7 +1,7 @@
 """Figures for the L2 study notes (notation + losses), one toy example throughout.
 
 Toy scan: 6x6 slice, classes 0 = background, 1 = liver, 2 = tumour.
-Run:  python make_l2_figures.py   (writes l2_*.pdf next to this file)
+Run:  python make_l2_figures.py   (writes l2_*.pdf into ../figures)
 """
 from pathlib import Path
 
@@ -10,7 +10,7 @@ import numpy as np
 from matplotlib.colors import ListedColormap
 from matplotlib.patches import FancyArrowPatch, Polygon, Rectangle
 
-OUT = Path(__file__).resolve().parent
+OUT = Path(__file__).resolve().parent.parent / "figures"
 W = 3.7  # column width in inches
 
 plt.rcParams.update({

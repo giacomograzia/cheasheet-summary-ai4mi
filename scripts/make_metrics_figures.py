@@ -1,6 +1,6 @@
 """Figures for the L5 (Metrics I) and L7 (Metrics II) study notes.
 
-Run:  python make_metrics_figures.py   (writes l5_*.pdf and l7_*.pdf next to this file; needs numpy, scipy, matplotlib)
+Run:  python make_metrics_figures.py   (writes l5_*.pdf and l7_*.pdf into ../figures; needs numpy, scipy, matplotlib)
 """
 from pathlib import Path
 
@@ -10,7 +10,7 @@ from matplotlib.patches import Circle, Rectangle
 from scipy import ndimage as ndi
 from scipy.signal import convolve2d
 
-OUT = Path(__file__).resolve().parent
+OUT = Path(__file__).resolve().parent.parent / "figures"
 W = 3.7  # column width in inches
 
 plt.rcParams.update({
