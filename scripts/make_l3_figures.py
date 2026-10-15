@@ -9,6 +9,8 @@ import numpy as np
 from matplotlib.patches import FancyBboxPatch, Polygon
 from scipy import ndimage as ndi
 
+from diagram import arrow, connect, path, side, textbox
+
 OUT = Path(__file__).resolve().parent.parent / "figures"
 W = 3.7  # column width in inches
 
@@ -184,31 +186,25 @@ for ax, f, txt in zip(axs, [8, 4, 1], ["1/8 res.: rigid\n(rough position)", "1/4
 fig.savefig(OUT / "l3_pyramid.pdf"); plt.close(fig)
 
 # ---- 7. VoxelMorph schematic -------------------------------------------------------
-fig, ax = plt.subplots(figsize=(W, 1.6))
-
-
-def box(x, y, w, h, text, fc, ec="k", fs=6):
-    ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.05", fc=fc, ec=ec, lw=0.6))
-    ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=fs)
-
-
-def arr(x0, y0, x1, y1, col="k"):
-    ax.annotate("", (x1, y1), (x0, y0), arrowprops=dict(arrowstyle="-|>", color=col, lw=0.7))
-
-
-box(0, 2.2, 1.3, 0.7, r"fixed $\mathcal{F}$", "#eeeeee")
-box(0, 1.1, 1.3, 0.7, r"moving $\mathcal{M}$", "#eeeeee")
-box(1.95, 1.4, 1.75, 1.2, "U-Net\n2 in-channels\n3 out-channels\nno softmax", "#e8eefb", BLUE, 5.8)
-box(4.2, 1.65, 1.7, 0.7, "displacement\nfield $t_\\theta$", "#e8eefb", BLUE, 5.8)
-box(4.2, 0.2, 1.7, 0.75, "spatial\ntransformer", "#fff2cc", "#b08000", 5.8)
-box(6.55, 0.2, 1.8, 0.75, r"warped $\mathcal{T}(\mathcal{M})$", "#eeeeee")
-box(6.3, 1.5, 2.5, 1.1, "loss =\nsimilarity($\\mathcal{F}$, $\\mathcal{T}(\\mathcal{M})$)\n+ $\\lambda\\,$smoothness",
-    "#e9f5e9", GREEN, 5.8)
-arr(1.35, 2.55, 2.0, 2.2); arr(1.35, 1.45, 2.0, 1.8)
-arr(3.65, 2.0, 4.2, 2.0); arr(5.05, 1.6, 5.05, 1.0)
-arr(1.35, 1.3, 4.2, 0.6); arr(5.95, 0.57, 6.55, 0.57)
-arr(7.45, 1.0, 7.45, 1.45); arr(1.35, 2.75, 6.3, 2.45)
-ax.text(0.0, 0.1, "no labels needed:\nthe loss only\ncompares images", fontsize=5.6, color=GREEN, ha="left")
-ax.set_xlim(-0.1, 8.95); ax.set_ylim(-0.05, 3.05); ax.axis("off")
+fig, ax = plt.subplots(figsize=(W, 1.85))
+ax.set_xlim(-0.35, 9.75); ax.set_ylim(-0.75, 3.35); ax.axis("off")
+F = textbox(ax, 0.55, 2.25, r"fixed $\mathcal{F}$", "#eeeeee", fs=5.6, minw=1.15)
+M = textbox(ax, 0.55, 1.05, r"moving $\mathcal{M}$", "#eeeeee", fs=5.6, minw=1.15)
+U = textbox(ax, 3.0, 1.65, "U-Net\n2 in-channels,\n3 out-channels,\nno softmax", "#e8eefb", BLUE, 5.4)
+D = textbox(ax, 5.55, 1.65, "displacement\nfield $t_\\theta$", "#e8eefb", BLUE, 5.4)
+ST = textbox(ax, 5.55, 0.2, "spatial\ntransformer", "#fff2cc", "#b08000", 5.4)
+WM = textbox(ax, 8.4, 0.2, "warped\n" r"$\mathcal{T}(\mathcal{M})$", "#eeeeee", fs=5.4)
+L = textbox(ax, 8.4, 1.85, "loss = similarity\n($\\mathcal{F}$, $\\mathcal{T}(\\mathcal{M})$)\n+ $\\lambda\\,$smoothness",
+            "#e9f5e9", GREEN, 5.4)
+arrow(ax, side(F, "right"), side(U, "left", 0.72))
+arrow(ax, side(M, "right", 0.65), side(U, "left", 0.28))
+connect(ax, U, D)
+arrow(ax, side(D, "bottom"), side(ST, "top"))
+path(ax, [side(M, "bottom"), (M[0], ST[1]), side(ST, "left")])  # moving image goes to the warper
+connect(ax, ST, WM)
+arrow(ax, side(WM, "top"), side(L, "bottom"))
+top = 3.1
+path(ax, [side(F, "top"), (F[0], top), (L[0], top), side(L, "top")])  # fixed image goes to the loss
+ax.text(0.0, -0.45, "no labels needed: the loss only compares images", fontsize=5.6, color=GREEN, ha="left")
 fig.savefig(OUT / "l3_voxelmorph.pdf"); plt.close(fig)
 print("written to", OUT)

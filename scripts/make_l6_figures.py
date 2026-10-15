@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.patches import FancyBboxPatch
 
+from diagram import arrow, connect, side, textbox
+
 OUT = Path(__file__).resolve().parent.parent / "figures"
 W = 3.7  # column width in inches
 
@@ -31,39 +33,41 @@ def arr(ax, x0, y0, x1, y1, col="k", text=None, dy=0.08):
 
 
 # ---- 1. pseudonymised vs anonymised, and how hard anonymisation is ---------------
-fig, ax = plt.subplots(figsize=(W, 2.0))
-box(ax, 0.0, 2.0, 2.2, 0.9, "name: J. Jansen\nborn: 1961-04-02\nscan.nii", "#fde0e0", RED)
-box(ax, 3.0, 2.0, 2.2, 0.9, "ID: 4711\nscan.nii", "#fff2cc", "#b08000")
-box(ax, 3.0, 1.15, 2.2, 0.55, "key file: 4711 = J. Jansen\n(kept, locked away)", "#fff9e6", "#b08000", fs=5.2)
-box(ax, 6.0, 2.0, 2.2, 0.9, "ID: 4711\nscan.nii", "#e9f5e9", GREEN)
-box(ax, 6.0, 1.15, 2.2, 0.55, "key file deleted", "#ffffff", "#999", fs=5.2, color="#777", ls="--")
-ax.plot([6.15, 8.05], [1.2, 1.65], color=RED, lw=0.8)
-arr(ax, 2.25, 2.45, 2.95, 2.45)
-arr(ax, 5.25, 2.45, 5.95, 2.45)
-for x, t, c in [(1.1, "original", RED), (4.1, "pseudo-anonymised", "#b08000"), (7.1, "anonymised", GREEN)]:
-    ax.text(x, 3.05, t, ha="center", va="bottom", fontsize=6.5, color=c, weight="bold")
+fig, ax = plt.subplots(figsize=(W, 2.1))
+ax.set_xlim(-0.1, 8.35); ax.set_ylim(-0.3, 3.35); ax.axis("off")
+xs = [1.1, 4.1, 7.1]
+o = textbox(ax, xs[0], 2.45, "name: J. Jansen\nborn: 1961-04-02\nscan.nii", "#fde0e0", RED, minw=2.3, minh=0.95)
+p = textbox(ax, xs[1], 2.45, "ID: 4711\nscan.nii", "#fff2cc", "#b08000", minw=2.3, minh=0.95)
+a_ = textbox(ax, xs[2], 2.45, "ID: 4711\nscan.nii", "#e9f5e9", GREEN, minw=2.3, minh=0.95)
+k = textbox(ax, xs[1], 1.3, "key file:\n4711 = J. Jansen\n(kept, locked away)", "#fff9e6", "#b08000", fs=5.3, minw=2.3)
+d = textbox(ax, xs[2], 1.3, "key file deleted:\nno way back\nto the name", "#ffffff", "#999", fs=5.3, color=RED,
+            ls="--", minw=2.3, minh=k[3])
+connect(ax, o, p); connect(ax, p, a_)
+for x, t_, c in [(xs[0], "original", RED), (xs[1], "pseudo-anonymised", "#b08000"), (xs[2], "anonymised", GREEN)]:
+    ax.text(x, 3.05, t_, ha="center", va="bottom", fontsize=6.5, color=c, weight="bold")
 # spectrum of difficulty
-ax.annotate("", (8.2, 0.45), (0.0, 0.45), arrowprops=dict(arrowstyle="-|>", color="k", lw=0.8))
-for x, t in [(0.5, "biopsy\nslide"), (2.5, "head MRI\n(deface!)"), (4.9, "whole-body\nCT"), (7.4, "iris\nphoto")]:
-    ax.plot(x, 0.45, "o", color=PURPLE, ms=3)
-    ax.text(x, 0.33, t, ha="center", va="top", fontsize=5.6)
-ax.text(0.0, 0.62, "easy to anonymise", fontsize=5.6, color=GREEN, ha="left")
-ax.text(8.2, 0.62, "impossible (the body is the ID)", fontsize=5.6, color=RED, ha="right")
-ax.set_xlim(-0.1, 8.35); ax.set_ylim(-0.25, 3.3); ax.axis("off")
+arrow(ax, (0.0, 0.3), (8.2, 0.3), lw=0.8)
+for x, t_ in [(0.6, "biopsy\nslide"), (2.6, "head MRI\n(deface!)"), (5.0, "whole-body\nCT"), (7.4, "iris\nphoto")]:
+    ax.plot(x, 0.3, "o", color=PURPLE, ms=3, zorder=5)
+    ax.text(x, 0.17, t_, ha="center", va="top", fontsize=5.6)
+ax.text(0.0, 0.45, "easy to anonymise", fontsize=5.6, color=GREEN, ha="left")
+ax.text(8.2, 0.45, "impossible (the body is the ID)", fontsize=5.6, color=RED, ha="right")
 fig.savefig(OUT / "l6_anonymisation.pdf"); plt.close(fig)
 
 # ---- 2. federated learning and heterogeneous sites --------------------------------
-fig = plt.figure(figsize=(W, 1.75))
-ax = fig.add_axes([0.0, 0.0, 0.58, 1.0])
-box(ax, 1.4, 2.35, 1.9, 0.6, "server: average\nthe weights", "#e8eefb", BLUE)
-for i, (x, name) in enumerate([(0.0, "hospital A"), (1.65, "hospital B"), (3.3, "hospital C")]):
-    box(ax, x, 0.15, 1.4, 0.95, f"{name}\ndata stays here\ntrain locally", "#f2f2f2", "k", fs=5.3)
-    cx = x + 0.7
-    arr(ax, cx - 0.12, 1.15, 2.35 - 0.15 + 0.15 * (i - 1), 2.3, col=GREEN)
-    arr(ax, 2.35 + 0.15 + 0.15 * (i - 1), 2.3, cx + 0.12, 1.15, col=BLUE)
-ax.text(0.15, 1.75, "weights\nup", fontsize=5.3, color=GREEN, ha="left")
-ax.text(4.55, 1.75, "global\nmodel\ndown", fontsize=5.3, color=BLUE, ha="right")
-ax.set_xlim(-0.1, 4.8); ax.set_ylim(0, 3.1); ax.axis("off")
+fig = plt.figure(figsize=(W, 1.8))
+ax = fig.add_axes([0.0, 0.0, 0.6, 1.0])
+ax.set_xlim(-0.1, 4.9); ax.set_ylim(0, 3.2); ax.axis("off")
+cxs = [0.7, 2.4, 4.1]
+srv = textbox(ax, 2.4, 2.55, "server: average the weights of all hospitals", "#e8eefb", BLUE, minw=4.6, minh=0.5)
+for cx, name in zip(cxs, ["hospital A", "hospital B", "hospital C"]):
+    h = textbox(ax, cx, 0.6, f"{name}\ndata stays\nhere, train\nlocally", "#f2f2f2", "k", fs=5.3, minw=1.45)
+    up, down = side(h, "top", 0.32), side(h, "top", 0.68)
+    sb = srv[1] - srv[3] / 2  # bottom of the server box
+    arrow(ax, up, (up[0], sb), col=GREEN)  # weights up
+    arrow(ax, (down[0], sb), down, col=BLUE)  # global model down
+ax.text(2.4, 3.05, "weights up", fontsize=5.4, color=GREEN, ha="right", va="center")
+ax.text(2.5, 3.05, "  global model down", fontsize=5.4, color=BLUE, ha="left", va="center")
 ax2 = fig.add_axes([0.66, 0.22, 0.34, 0.6])
 x = np.linspace(0, 1, 300)
 for mu, sd, c, n in [(0.35, 0.07, "#555", "A"), (0.5, 0.1, PURPLE, "B"), (0.68, 0.06, RED, "C")]:
